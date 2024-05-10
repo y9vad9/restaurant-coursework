@@ -1,0 +1,13 @@
+plugins {
+    java
+}
+
+dependencies {
+    implementation(projects.libs.fsm)
+    implementation(libs.rubenlagus.telegramBotsApi)
+    implementation(libs.jackson.core)
+
+    implementation(libs.persistance.eclipselink)
+
+    implementation(projects.domain)
+}

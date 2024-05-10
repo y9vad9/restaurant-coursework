@@ -6,10 +6,15 @@ pluginManagement {
         mavenCentral()
         google()
     }
+    plugins {
+        kotlin("jvm") version "1.9.21"
+    }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -18,4 +23,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "restaurant-coursework"
 
-include(":server", ":api", ":desktop")
+include(":domain", ":data", ":libs:fsm", ":bot")
