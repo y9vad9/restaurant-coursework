@@ -2,13 +2,16 @@ package com.y9vad9.restaurant.domain.tables.repository;
 
 import com.y9vad9.jfsm.context.FSMContextElement;
 import com.y9vad9.restaurant.domain.system.types.Range;
+import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.tables.types.TableOverview;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -23,28 +26,20 @@ public interface TablesRepository extends FSMContextElement {
         return KEY;
     }
 
-    /**
-     * Додає або замінює існуючий стіл.
-     *
-     * @param table стіл для додавання або заміни
-     * @return об'єкт {@link CompletableFuture}, який містить {@code null}, якщо операція пройшла успішно
-     */
-    Future<Void> addOrFail(Table table);
+    CompletableFuture<Integer> setTableReserved(int tableNumber, Table.Reservation reservation);
 
-    /**
-     * Отримує список заброньованих столів з репозиторію.
-     *
-     * @return об'єкт {@link Future}, який містить список заброньованих столів
-     */
-    Future<List<Table>> getReservedTables();
+    CompletableFuture<List<Table>> getReservedTables(UserId userId);
 
-    /**
-     * Отримує список вільних столів з репозиторію.
-     *
-     * @return об'єкт {@link Future}, який містить список вільних столів
-     */
-    Future<List<TableOverview>> getFreeTables(LocalDate date, Range<LocalTime> timeRange);
+    CompletableFuture<List<Table>> getReservedTables(Range<LocalDateTime> timeRange);
 
-    Future<List<Range<LocalTime>>> getAvailableTime(int guestsNumber, Range<LocalDateTime> possibleTime);
+    CompletableFuture<Void> removeReservation(int reservationId);
+
+    CompletableFuture<Optional<Table.Reservation>> getReservation(int reservationId);
+
+    CompletableFuture<List<TableOverview>> getFreeTables(int guests, Range<LocalDateTime> timeRange);
+
+    CompletableFuture<List<Range<LocalTime>>> getAvailableTime(int guestsNumber, Range<LocalDateTime> possibleTime);
+
+    CompletableFuture<Integer> getMaxTableCapacity();
 }
 

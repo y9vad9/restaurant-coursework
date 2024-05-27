@@ -12,4 +12,7 @@ public record BotAnswer(
     public BotAnswer(UserId userId, String message) {
         this(userId, message, List.of());
     }
+    public BotAnswer(UserId userId, String message, String buttonText) {
+        this(userId, message, List.of(List.of(buttonText)));
+    }
 }

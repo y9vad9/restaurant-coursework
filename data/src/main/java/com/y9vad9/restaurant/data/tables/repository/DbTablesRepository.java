@@ -1,31 +1,24 @@
-package com.y9vad9.restaurant.data.TABLES.repository;
+package com.y9vad9.restaurant.data.tables.repository;
 
-import com.y9vad9.restaurant.db.generated.tables.Tables;
 import com.y9vad9.restaurant.domain.system.types.Range;
 import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.tables.types.TableOverview;
-import org.jetbrains.annotations.Nullable;
-import org.jooq.DSLContext;
-import org.jooq.Field;
+import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.impl.DSL;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import java.util.stream.Collectors;
 
 import static com.y9vad9.restaurant.db.generated.tables.Reservation.RESERVATION;
 import static com.y9vad9.restaurant.db.generated.tables.Tables.TABLES;
-import static org.jooq.impl.DSL.*;
 
 public class DbTablesRepository implements TablesRepository {
     final DSLContext context;
@@ -38,55 +31,166 @@ public class DbTablesRepository implements TablesRepository {
     }
 
     @Override
-    public CompletableFuture<Void> addOrFail(Table table) {
-        return null;
-    }
-
-    @Override
-    public Future<List<Table>> getReservedTables() {
-        return executorService.submit(
-            () -> context.select(TABLES.asterisk(), RESERVATION.asterisk())
-                .where(TABLES.reservation().notEqual(null))
-                .stream()
-                .map(this::mapDbToDomain)
-                .toList()
+    public CompletableFuture<Integer> setTableReserved(int tableNumber, Table.Reservation reservation) {
+        return CompletableFuture.supplyAsync(
+            () -> context.insertInto(RESERVATION, RESERVATION.GUEST, RESERVATION.GUEST_NAME, RESERVATION.RESERVED_SEATS, RESERVATION.TIME_START, RESERVATION.TIME_END, RESERVATION.TABLE_ID)
+                .values(reservation.userId().toString(), reservation.fullName(), reservation.reservedSeats(), reservation.reservationTime().first(), reservation.reservationTime().last(), tableNumber)
+                .returning(RESERVATION.ID)
+                .fetchOne(RESERVATION.ID)
         );
     }
 
     @Override
-    public Future<List<TableOverview>> getFreeTables(LocalDate date, Range<LocalTime> timeRange) {
-        return executorService.submit(
-            () -> context.select(TABLES.asterisk(), RESERVATION.asterisk())
-                .where(TABLES.reservation().eq(null))
-                .stream()
-                .map(this::mapDbToDomain)
-                .toList()
-        );
-    }
-
-    @Override
-    public CompletableFuture<List<Range<LocalTime>>> getAvailableTime(int guestsNumber, Range<LocalTime> possibleTime) {
-        CompletableFuture.supplyAsync(
-            () -> context.select(count(RESERVATION.TIME_END.minus(RESERVATION.TIME_START)).as("r_sum"), TABLES.NUMBER)
-                    .from(TABLES)
-                    .leftJoin(RESERVATION)
-                    .on(RESERVATION.TABLE_ID.eq(TABLES.NUMBER))
-                    .where(TABLES.SEATS.greaterOrEqual(guestsNumber))
-                    .orderBy(field("r_sum"))
-                    .fetchAny()
-            ,
-            executorService
-        ).thenApply(record -> {
-            context.select(RESERVATION.asterisk())
+    public CompletableFuture<List<Table>> getReservedTables(UserId userId) {
+        return CompletableFuture.supplyAsync(
+            () -> context.select(DSL.asterisk())
                 .from(RESERVATION)
-                .where(RESERVATION.TABLE_ID.eq(record.get(TABLES.NUMBER)).and(RESERVATION.TIME_START.greaterOrEqual(possibleTime.first())))
-            if ()
-        });
+                .join(TABLES)
+                .on(TABLES.NUMBER.eq(RESERVATION.TABLE_ID))
+                .where(RESERVATION.GUEST.eq(userId.toString()))
+                .stream()
+                .map(this::mapDbToDomain)
+                .toList(),
+            executorService
+        );
+    }
+
+    @Override
+    public CompletableFuture<List<Table>> getReservedTables(Range<LocalDateTime> timeRange) {
+        return CompletableFuture.supplyAsync(
+            () -> context.select(DSL.asterisk())
+                .from(RESERVATION)
+                .join(TABLES)
+                .on(TABLES.NUMBER.eq(RESERVATION.TABLE_ID))
+                .where(
+                    RESERVATION.TIME_START.lessOrEqual(timeRange.first())
+                        .and(RESERVATION.TIME_END.lessOrEqual(timeRange.last()))
+                        .or(RESERVATION.TIME_START.between(timeRange.first(), timeRange.last()))
+                        .or(RESERVATION.TIME_END.between(timeRange.first(), timeRange.last()))
+                )
+                .stream()
+                .map(this::mapDbToDomain)
+                .toList(),
+            executorService
+        );
+    }
+
+    @Override
+    public CompletableFuture<Void> removeReservation(int reservationId) {
+        return CompletableFuture.supplyAsync(
+            () -> {
+                context.deleteFrom(RESERVATION).where(RESERVATION.ID.eq(reservationId)).execute();
+                return null;
+            },
+            executorService
+        );
+    }
+
+    @Override
+    public CompletableFuture<Optional<Table.Reservation>> getReservation(int reservationId) {
+        return CompletableFuture.supplyAsync(
+            () -> context.selectFrom(RESERVATION)
+                .where(RESERVATION.ID.eq(reservationId))
+                .fetchOptional()
+                .map(this::toDomainReservation)
+        );
+    }
+
+    @Override
+    public CompletableFuture<List<TableOverview>> getFreeTables(int guests, Range<java.time.LocalDateTime> timeRange) {
+        return CompletableFuture.supplyAsync(
+            () -> context.select(TABLES.asterisk())
+                .from(TABLES)
+                .whereNotExists(
+                    context.selectOne()
+                        .from(RESERVATION)
+                        .where(
+                            RESERVATION.TABLE_ID.eq(TABLES.NUMBER).and(
+                                RESERVATION.TIME_START.lessThan(timeRange.last())
+                                    .and(RESERVATION.TIME_END.greaterThan(timeRange.first()))
+                                    .or(RESERVATION.TIME_START.between(timeRange.first(), timeRange.last()))
+                                    .or(RESERVATION.TIME_END.between(timeRange.first(), timeRange.last())))
+                        )
+                )
+                .and(TABLES.SEATS.greaterOrEqual(guests))
+                .stream()
+                .map(this::mapDbToDomainOverview)
+                .toList(),
+            executorService
+        );
+    }
+
+    @Override
+    public CompletableFuture<List<Range<LocalTime>>> getAvailableTime(int guestsNumber, Range<LocalDateTime> possibleTime) {
+        return CompletableFuture.supplyAsync(() -> {
+            long availableTables = context.selectCount()
+                .from(TABLES)
+                .where(TABLES.SEATS.greaterOrEqual(guestsNumber))
+                .fetchSingleInto(Long.class);
+
+            List<Range<LocalTime>> initialTimeRanges = createTimeRanges(new Range<>(possibleTime.first().toLocalTime(), possibleTime.last().toLocalTime()));
+
+            Result<Record3<Integer, LocalDateTime, LocalDateTime>> overlappingReservations = context
+                .select(RESERVATION.TABLE_ID, RESERVATION.TIME_START, RESERVATION.TIME_END)
+                .from(RESERVATION)
+                .where(RESERVATION.TIME_START.lessThan(possibleTime.last()))
+                .and(RESERVATION.TIME_END.greaterThan(possibleTime.first()))
+                .fetch();
+
+            HashMap<LocalTime, Integer> occupiedRanges = new HashMap<>();
+
+            for (Record3<Integer, LocalDateTime, LocalDateTime> reservation : overlappingReservations) {
+                LocalTime resStart = reservation.get(RESERVATION.TIME_START).toLocalTime();
+                LocalTime resEnd = reservation.get(RESERVATION.TIME_END).toLocalTime();
+
+                for (LocalTime hour = resStart; hour.isBefore(resEnd); hour = hour.plusHours(1)) {
+                    occupiedRanges.put(hour, occupiedRanges.getOrDefault(hour, 0) + 1);
+                }
+            }
+
+            List<Range<LocalTime>> finalAvailableRanges = initialTimeRanges.stream()
+                .filter(hourRange -> {
+                    int occupancyCount = 0;
+                    for (LocalTime hour = hourRange.first(); hour.isBefore(hourRange.last()); hour = hour.plusHours(1)) {
+                        occupancyCount += occupiedRanges.getOrDefault(hour, 0);
+                    }
+                    return occupancyCount <= availableTables;
+                })
+                .toList();
+
+            return finalAvailableRanges;
+        }, executorService);
+    }
+
+
+    private List<Range<LocalTime>> createTimeRanges(Range<LocalTime> possibleTime) {
+        List<Range<LocalTime>> timeRanges = new ArrayList<>();
+        LocalTime start = possibleTime.first();
+        LocalTime end = possibleTime.last();
+
+        while (start.isBefore(end)) {
+            LocalTime nextHour = start.plusHours(1);
+            LocalTime rangeEnd = nextHour.isBefore(end) ? nextHour : end;
+            timeRanges.add(new Range<>(start, rangeEnd));
+            start = nextHour;
+        }
+
+        return timeRanges;
+    }
 
 
 
 
-        return context.select(select).fetchAsync().thenApply(result -> result.into(Range.class));
+    @Override
+    public CompletableFuture<Integer> getMaxTableCapacity() {
+        return CompletableFuture.supplyAsync(
+            () ->
+                Objects.requireNonNull(
+                    context.select(DSL.max(TABLES.SEATS).as("max_value"))
+                        .from(TABLES).fetchAny()
+                ).get(DSL.field("max_value", Integer.class)),
+            executorService
+        );
     }
 
     private Table mapDbToDomain(Record record) {
@@ -94,13 +198,27 @@ public class DbTablesRepository implements TablesRepository {
         boolean isReserved = record.field(RESERVATION.GUEST_NAME) != null;
 
         if (isReserved) {
-            reservation = new Table.Reservation(
-                UserId.fromString(record.get(RESERVATION.GUEST_ID)),
-                record.get(RESERVATION.GUEST_NAME),
-                new Range<>(record.get(RESERVATION.TIME_START).toLocalTime(), record.get(RESERVATION.TIME_END).toLocalTime())
-            );
+            reservation = toDomainReservation(record);
         }
 
         return new Table(Optional.ofNullable(reservation), record.get(TABLES.NUMBER), isReserved ? record.get(RESERVATION.RESERVED_SEATS) : record.get(TABLES.SEATS));
+    }
+
+    private Table.Reservation toDomainReservation(Record record) {
+        return new Table.Reservation(
+            record.get(RESERVATION.ID),
+            UserId.fromString(record.get(RESERVATION.GUEST)),
+            record.get(RESERVATION.GUEST_NAME),
+            record.get(RESERVATION.RESERVED_SEATS),
+            new Range<>(record.get(RESERVATION.TIME_START), record.get(RESERVATION.TIME_END))
+        );
+    }
+
+    private TableOverview mapDbToDomainOverview(Record record) {
+        return new TableOverview(
+            record.get(TABLES.NUMBER),
+            record.get(TABLES.SEATS),
+            null
+        );
     }
 }

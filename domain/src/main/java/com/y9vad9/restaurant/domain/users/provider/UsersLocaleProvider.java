@@ -5,6 +5,7 @@ import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public interface UsersLocaleProvider extends FSMContextElement {
     FSMContextElement.Key<UsersLocaleProvider> KEY = Key.create();

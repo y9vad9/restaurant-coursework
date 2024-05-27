@@ -4,12 +4,12 @@ import com.y9vad9.jfsm.context.FSMContextElement;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public interface UsersLocaleConsumer extends FSMContextElement {
     FSMContextElement.Key<UsersLocaleConsumer> KEY = Key.create();
 
-    CompletableFuture<Void> consume(UserId userId, Strings strings);
+    Future<Integer> consume(UserId userId, Strings strings);
 
     @Override
     default Key<?> key() {

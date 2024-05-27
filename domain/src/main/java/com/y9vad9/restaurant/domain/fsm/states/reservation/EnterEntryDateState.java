@@ -10,6 +10,8 @@ import com.y9vad9.restaurant.domain.fsm.states.MainMenuState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.types.Schedule;
+import com.y9vad9.restaurant.domain.utils.DateUtils;
+import com.y9vad9.restaurant.domain.utils.ListUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -23,19 +25,25 @@ public record EnterEntryDateState(Data data) implements BotState<EnterEntryDateS
     record Data(String name, int guestsNumber) {
     }
 
-    private static final String DATE_REGEX = "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.\\d{4}$\n";
-
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(IncomingMessage message, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
         ZoneId zoneId = context.getElement(SystemRepository.KEY).getZoneId();
         Strings strings = context.getElement(Strings.KEY);
+        Schedule schedule = context.getElement(SystemRepository.KEY).getSchedule();
 
-        List<List<String>> rows = createRows(getNext14Days(strings, zoneId), 2);
+        List<List<String>> rows = ListUtils.makeRows(DateUtils.getFollowingWorkingDays(14, strings, zoneId, schedule), 2);
         rows.add(List.of(strings.getCancelTitle()));
 
-        sendAction.execute(
-            new BotAnswer(message.userId(), strings.getWriteDateOfEntryMessage(), rows)
-        );
+        if (rows.size() > 1) {
+            sendAction.execute(
+                new BotAnswer(message.userId(), strings.getWriteDateOfEntryMessage(), rows)
+            );
+        } else {
+            sendAction.execute(
+                new BotAnswer(message.userId(), strings.getNoAvailableDays())
+            );
+            return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
+        }
 
         return CompletableFuture.completedFuture(this);
     }
@@ -46,7 +54,7 @@ public record EnterEntryDateState(Data data) implements BotState<EnterEntryDateS
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        String input = message.message();
+        String input = message.message().substring(0, message.message().indexOf("(")).trim();
         Strings strings = context.getElement(Strings.KEY);
         Schedule schedule = context
             .getElement(SystemRepository.KEY)
@@ -56,18 +64,10 @@ public record EnterEntryDateState(Data data) implements BotState<EnterEntryDateS
             return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
         }
 
-        if (input.matches(DATE_REGEX)) {
-            String[] parts = input.split("\\.");
+        if (input.matches(DateUtils.DATE_REGEX)) {
+            LocalDate localDate = DateUtils.parseDate(input);
 
-            LocalDate localDate;
-
-            try {
-                localDate = LocalDate.of(
-                    Integer.parseInt(parts[2]),
-                    Integer.parseInt(parts[1]),
-                    Integer.parseInt(parts[0])
-                );
-            } catch (Exception e) {
+            if (localDate == null) {
                 sendAction.execute(new BotAnswer(message.userId(), strings.getInvalidInputMessage()));
                 return CompletableFuture.completedFuture(this);
             }
@@ -91,29 +91,5 @@ public record EnterEntryDateState(Data data) implements BotState<EnterEntryDateS
                 this
             );
         }
-    }
-
-    private List<String> getNext14Days(Strings strings, ZoneId zoneId) {
-        List<String> daysList = new ArrayList<>();
-        LocalDate currentDate = LocalDate.now(zoneId).plusDays(1); // Get the date starting from tomorrow in UTC
-
-        for (int i = 0; i < 14; i++) {
-            String formattedDate = currentDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-            String displayName = currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, strings.getLocale());
-            String dayWithDisplayName = formattedDate + " (" + displayName + ")";
-            daysList.add(dayWithDisplayName);
-            currentDate = currentDate.plusDays(1); // Move to the next day
-        }
-
-        return daysList;
-    }
-
-    private List<List<String>> createRows(List<String> list, int elementsPerRow) {
-        List<List<String>> rows = new ArrayList<>();
-        for (int i = 0; i < list.size(); i += elementsPerRow) {
-            int endIndex = Math.min(i + elementsPerRow, list.size());
-            rows.add(list.subList(i, endIndex));
-        }
-        return rows;
     }
 }

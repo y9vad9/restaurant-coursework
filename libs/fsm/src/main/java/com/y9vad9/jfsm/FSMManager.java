@@ -8,47 +8,44 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public final class FSMManager<TKey, TIntent, TAction> {
     private final StateStorage<TKey> storage;
-    private final Cache<TKey, StateMachine<TIntent, TAction>> cache;
-    private final Supplier<FSMState<?, TIntent, TAction>> initializer;
+    private final Cache<TKey, StateMachine<TKey, TIntent, TAction>> cache;
 
     public FSMManager(
         StateStorage<TKey> storage,
         Duration fsmAliveTime,
         int maxFsmInUse,
-        Executor executor,
-        Supplier<FSMState<?, TIntent, TAction>> initializer
-        ) {
+        Executor executor
+    ) {
         this.storage = storage;
         this.cache = Caffeine.newBuilder()
             .expireAfterAccess(fsmAliveTime)
             .maximumSize(maxFsmInUse)
             .executor(executor)
             .evictionListener((key, value, cause) ->
-                ((StateMachine<?, ?>) Objects.requireNonNull(value)).close()
+                ((StateMachine<?, ?, ?>) Objects.requireNonNull(value)).close()
             )
             .build();
-        this.initializer = initializer;
     }
 
     @SuppressWarnings("unchecked")
-    public CompletableFuture<StateMachine<TIntent, TAction>> getStateMachine(
+    public CompletableFuture<StateMachine<TKey, TIntent, TAction>> getStateMachine(
         TKey key
     ) {
-        StateMachine<TIntent, TAction> saved = cache.getIfPresent(key);
+        StateMachine<TKey, TIntent, TAction> saved = cache.getIfPresent(key);
 
         if (saved != null)
             return CompletableFuture.completedFuture(saved);
 
         return storage.loadState(key)
             .thenApply(state -> {
-                throw new IllegalArgumentException("");
-//                StateMachine<TIntent, TAction> stateMachine = (FSMState<?, TIntent, TAction>) state;
-//                cache.put(key, stateMachine);
-//                return stateMachine;
+                StateMachine<TKey, TIntent, TAction> stateMachine = new StateMachine<>((FSMState<?, TIntent, TAction>) state, storage, key);
+                cache.put(key, stateMachine);
+                return stateMachine;
             });
     }
 }

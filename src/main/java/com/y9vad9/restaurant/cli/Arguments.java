@@ -1,4 +1,4 @@
-package com.y9vad9.restaurant;
+package com.y9vad9.restaurant.cli;
 
 import java.util.List;
 import java.util.Optional;

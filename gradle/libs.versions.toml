@@ -3,12 +3,9 @@ javalin = "6.1.3"
 retrofit = "2.11.0"
 rxjava = "3.1.8"
 jackson = "2.17.0"
-jooq = "3.19.7"
+jooq = "3.19.8"
 
 [libraries]
-## Javalin залежності
-javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
-
 ## Retrofit залежності
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
@@ -17,6 +14,7 @@ rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 
 # Telegram Bot API
 rubenlagus-telegramBotsApi = { module = "org.telegram:telegrambots-longpolling", version.require = "7.2.1" }
+rubenlagus-telegramClientApi = { module = "org.telegram:telegrambots-client", version.require = "7.2.1" }
 
 caching-caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.require = "3.1.8" }
 
@@ -29,6 +27,8 @@ persistance-eclipselink = { module = "org.eclipse.persistence:eclipselink", vers
 
 jooq-core = { module = "org.jooq:jooq", version.ref = "jooq" }
 jooq-meta = { module = "org.jooq:jooq-meta-extensions", version.ref = "jooq" }
+
+h2 = { module = "com.h2database:h2", version.require = "2.2.224" }
 
 [plugins]
 jooq = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }

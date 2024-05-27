@@ -7,10 +7,11 @@ import com.y9vad9.jfsm.functions.SendActionFunction;
 import com.y9vad9.restaurant.domain.fsm.BotAnswer;
 import com.y9vad9.restaurant.domain.fsm.BotState;
 import com.y9vad9.restaurant.domain.fsm.IncomingMessage;
+import com.y9vad9.restaurant.domain.fsm.states.admin.AdminMenuState;
+import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterYourNameState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
-import com.y9vad9.restaurant.domain.users.provider.UsersLocaleProvider;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,8 +21,17 @@ public class MainMenuState implements BotState<Void> {
     public static MainMenuState INSTANCE = new MainMenuState();
 
     @Override
-    public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(IncomingMessage prevIntent, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
+    public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(
+        IncomingMessage prevIntent,
+        SendActionFunction<BotAnswer> sendAction,
+        FSMContext context
+    ) {
         Strings strings = context.getElement(Strings.KEY);
+        SystemRepository systemRepository = context.getElement(SystemRepository.KEY);
+
+        if (systemRepository.getAdmins().stream().anyMatch(id -> prevIntent.userId().equals(id)))
+            return CompletableFuture.completedFuture(AdminMenuState.INSTANCE);
+
         sendAction.execute(new BotAnswer(prevIntent.userId(), strings.getHelloMessage(), menuButtons(strings)));
         return BotState.super.onEnter(prevIntent, sendAction, context);
     }
@@ -41,18 +51,19 @@ public class MainMenuState implements BotState<Void> {
             .executor();
         final var systemRepository = context.getElement(SystemRepository.KEY);
         final var tablesRepository = context.getElement(TablesRepository.KEY);
+        final var strings = context.getElement(Strings.KEY);
 
-        return context.getElement(UsersLocaleProvider.KEY)
-            .provide(message.userId())
-            .thenCompose(strings -> CompletableFuture.supplyAsync(() -> handleCommand(
-                    message,
-                    strings,
-                    sendAction,
-                    systemRepository,
-                    tablesRepository,
-                    context
-                ), executor)
-            );
+        return CompletableFuture.supplyAsync(
+            () -> handleCommand(
+                message,
+                strings,
+                sendAction,
+                systemRepository,
+                tablesRepository,
+                context
+            ),
+            executor
+        );
     }
 
     private FSMState<?, IncomingMessage, BotAnswer> handleCommand(
@@ -67,11 +78,10 @@ public class MainMenuState implements BotState<Void> {
         String messageText;
 
         if (command.equals(strings.getBookTableTitle())) {
-            onEnter(message, sendAction, context);
-            return this;
+            return EnterYourNameState.INSTANCE;
         } else if (command.equals(strings.getBookedTablesTitle())) {
             try {
-                messageText = strings.getBookedTablesMessage(tablesRepository.getReservedTables().get());
+                messageText = strings.getBookedTablesMessage(tablesRepository.getReservedTables(message.userId()).get());
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -83,9 +93,11 @@ public class MainMenuState implements BotState<Void> {
             messageText = strings.getUnknownCommandMessage();
         }
 
-        if (!messageText.isEmpty()) {
+        if (messageText.isEmpty()) {
             onEnter(message, sendAction, context);
         }
+
+        sendAction.execute(new BotAnswer(message.userId(), messageText));
 
         return this;
     }

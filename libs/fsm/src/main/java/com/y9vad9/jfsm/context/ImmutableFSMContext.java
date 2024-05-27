@@ -35,4 +35,11 @@ final class ImmutableFSMContext implements FSMContext {
         elements.forEach(element -> map.put(element.key(), element));
         return new ImmutableFSMContext(Collections.unmodifiableMap(map));
     }
+
+    @Override
+    public String toString() {
+        return "ImmutableFSMContext(" +
+            String.join(",", elements.values().stream().map(FSMContextElement::toString).toList()) +
+            ')';
+    }
 }

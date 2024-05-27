@@ -1,9 +1,12 @@
 package com.y9vad9.restaurant.domain.system.strings;
 
 import com.y9vad9.restaurant.domain.system.types.Contacts;
+import com.y9vad9.restaurant.domain.system.types.Range;
 import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -29,7 +32,7 @@ public final class UkrainianStrings implements Strings {
 
     @Override
     public String getInvalidInputMessage() {
-        return "";
+        return "Неправильно введені дані.";
     }
 
     @Override
@@ -55,13 +58,13 @@ public final class UkrainianStrings implements Strings {
     @Override
     public String getWhenWeWorkMessage(Schedule schedule) {
         return "Ми працюємо за наступним графіком:\n" +
-            " • Понеділок: " + schedule.monday() + "\n" +
-            " • Вівторок: " + schedule.tuesday() + "\n" +
-            " • Середа: " + schedule.wednesday() + "\n" +
-            " • Четвер: " + schedule.thursday() + "\n" +
-            " • П'ятниця: " + schedule.friday() + "\n" +
-            " • Субота: " + schedule.saturday() + "\n" +
-            " • Неділя: " + schedule.sunday() + "\n";
+            " • Понеділок: " + ((schedule.monday() == null || schedule.monday().isEmpty()) ? "Зачинено" : schedule.monday()) + "\n" +
+            " • Вівторок: " + ((schedule.tuesday() == null || schedule.tuesday().isEmpty()) ? "Зачинено" : schedule.tuesday()) + "\n" +
+            " • Середа: " + ((schedule.wednesday() == null || schedule.wednesday().isEmpty()) ? "Зачинено" : schedule.wednesday()) + "\n" +
+            " • Четвер: " + ((schedule.thursday() == null || schedule.thursday().isEmpty()) ? "Зачинено" : schedule.thursday()) + "\n" +
+            " • П'ятниця: " + ((schedule.friday() == null || schedule.friday().isEmpty()) ? "Зачинено" : schedule.friday()) + "\n" +
+            " • Субота: " + ((schedule.saturday() == null || schedule.saturday().isEmpty()) ? "Зачинено" : schedule.saturday()) + "\n" +
+            " • Неділя: " + ((schedule.sunday() == null || schedule.sunday().isEmpty()) ? "Зачинено" : schedule.sunday()) + "\n";
     }
 
     @Override
@@ -98,12 +101,25 @@ public final class UkrainianStrings implements Strings {
         return builder.toString();
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public String getBookedTablesMessage(List<Table> tables) {
         if (tables.isEmpty())
             return "Ви ще не зарезервували ні одного столику.";
-        return "Ваші зарезервовані столики:\n" +
-            tables.stream().map(table -> " • Столик номер " + table.number() + ", макс. гостей " + table.seats() + ".")
+
+        return "Ваші зарезервовані столики:\n\n" +
+            tables.stream()
+                .map(table -> {
+                    final var reservation = table.reservation().get();
+                    final var reservationTime = reservation.reservationTime();
+
+                    return "<b> • Столик №" + table.number() + "</b>" +
+                        "\n     Номер бронювання: " + reservation.id() +
+                        "\n     На ім'я: " + reservation.fullName() +
+                        "\n     Гостей " + table.seats() +
+                        "\n     Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
+                        "\n     Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                })
                 .collect(Collectors.joining("\n"));
     }
 
@@ -118,19 +134,19 @@ public final class UkrainianStrings implements Strings {
     }
 
     @Override
-    public String getUnableToProceedCountOfPeopleMessage() {
+    public String getUnableToProceedCountOfPeopleMessage(int max) {
         return "Нажаль, ми не маємо підходящих столиків для такої кількості людей, " +
-            "спробуйте зарезервувати декілька.";
+            "спробуйте зарезервувати декілька. Максимум: " + max + ".";
     }
 
     @Override
     public String getWriteDateOfEntryMessage() {
-        return "";
+        return "Напишіть дату, на яку хочете взяти бронювання:";
     }
 
     @Override
     public String getWriteEnterTimeMessage() {
-        return "Введіть час на який бажаєте забронювати (в 24-годинному форматі за прикладом: година:хвилина):";
+        return "Оберіть час на який хочете забронювати (або введіть бажаний проміж часу за прикладом год:хв – год:хв):";
     }
 
     @Override
@@ -140,14 +156,14 @@ public final class UkrainianStrings implements Strings {
 
     @Override
     public String getSuccessfulBookingMessage(Table table) {
-        // safe to use orElseThrow – we always have reservation in this case.
         Table.Reservation reservation = table.reservation().orElseThrow();
-        return "Успішно заброньовано! Ваше бронювання:" +
+        Range<LocalDateTime> reservationTime = reservation.reservationTime();
+        return "Успішно заброньовано! Ваше бронювання:\n" +
+            "Номер бронювання: " + reservation.id() + ".\n" +
             "Номер столику: " + table.number() + ".\n" +
             "Ім'я: " + reservation.fullName() + ".\n" +
-            // TODO: time formatting
-            "Час бронювання: " + reservation.reservationTime().first().toString() +
-            "До: " + reservation.reservationTime().last().toString();
+            "Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() + ".\n" +
+            "Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ".";
     }
 
     @Override
@@ -162,6 +178,66 @@ public final class UkrainianStrings implements Strings {
 
     @Override
     public String getCancelTitle() {
-        return "🔙 Відмінити";
+        return "🔙 Скасувати";
+    }
+
+    @Override
+    public String getNoAvailableDays() {
+        return "Нажаль немає вільних дат для бронювання ☹️";
+    }
+
+    @Override
+    public String getReservationsListAdmin() {
+        return "Показати бронювання гостей";
+    }
+
+    @Override
+    public String getAdminHelloMessage() {
+        return "Вітаємо в адміністраторскій панелі. Тут ви можете переглядати бронювання" +
+            " гостей та саморучно бронювати, якщо бронювання відбувається через телефон.";
+    }
+
+    @Override
+    public String getTodayTitle() {
+        return "Сьогодні";
+    }
+
+    @Override
+    public String getSelectDateMessage() {
+        return "Оберіть дату:";
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @Override
+    public String getReservationsListAdminMessage(List<Table> tables) {
+        if (tables.isEmpty())
+            return "Не було заброньовано ні одного столику за обраний період.";
+
+        return "Зарезервовані столики:\n\n" +
+            tables.stream()
+                .map(table -> {
+                    final var reservation = table.reservation().get();
+                    final var reservationTime = reservation.reservationTime();
+
+                    return "<b> • Столик №" + table.number() + "</b>" +
+                        "\n     Номер бронювання: " + reservation.id() +
+                        "\n     На ім'я: " + reservation.fullName() +
+                        "\n     Гостей " + table.seats() +
+                        "\n     Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
+                        "\n     Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                })
+                .collect(Collectors.joining("\n")) +
+            "\n\nВідмінити бронювання можна за допомогою команди /cancel [ідентифікатор] [причина]. " +
+            "Повідомлення про це буде відправлено гостю.";
+    }
+
+    @Override
+    public String getReservationCanceledRegular() {
+        return "Бронювання успішно скасовано!";
+    }
+
+    @Override
+    public String getReservationCanceled(Table.Reservation reservation, String reason) {
+        return "Нажаль, ваше бронювання було скасовано: " + reason + ".";
     }
 }

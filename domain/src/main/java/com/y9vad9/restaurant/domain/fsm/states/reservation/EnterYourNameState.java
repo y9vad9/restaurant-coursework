@@ -12,6 +12,22 @@ import com.y9vad9.restaurant.domain.system.strings.Strings;
 import java.util.concurrent.CompletableFuture;
 
 public class EnterYourNameState implements BotState<Void> {
+    public static EnterYourNameState INSTANCE = new EnterYourNameState();
+
+    @Override
+    public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(IncomingMessage prevIntent, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
+        final var strings = context.getElement(Strings.KEY);
+
+        sendAction.execute(
+            new BotAnswer(
+                prevIntent.userId(),
+                strings.getWriteNameForBookingMessage(),
+                strings.getCancelTitle()
+            )
+        );
+        return CompletableFuture.completedFuture(this);
+    }
+
     @Override
     public Void data() {
         return null;

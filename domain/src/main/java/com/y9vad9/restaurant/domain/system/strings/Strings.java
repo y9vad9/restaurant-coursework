@@ -42,7 +42,7 @@ public interface Strings extends FSMContextElement {
 
     String getWriteNumberOfPeopleForTableMessage();
 
-    String getUnableToProceedCountOfPeopleMessage();
+    String getUnableToProceedCountOfPeopleMessage(int max);
 
     String getWriteDateOfEntryMessage();
 
@@ -57,4 +57,20 @@ public interface Strings extends FSMContextElement {
     String getWeDontWorkAtGivenDay();
 
     String getCancelTitle();
+
+    String getNoAvailableDays();
+
+    String getReservationsListAdmin();
+
+    String getAdminHelloMessage();
+
+    String getTodayTitle();
+
+    String getSelectDateMessage();
+
+    String getReservationsListAdminMessage(List<Table> tables);
+
+    String getReservationCanceledRegular();
+
+    String getReservationCanceled(Table.Reservation reservation, String reason);
 }

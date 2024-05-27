@@ -3,6 +3,7 @@ package com.y9vad9.restaurant.domain.tables.types;
 import com.y9vad9.restaurant.domain.system.types.Range;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -17,6 +18,6 @@ public record Table(
     int number,
     int seats
 ) {
-    public record Reservation(UserId userId, String fullName, Range<LocalTime> reservationTime) {
+    public record Reservation(int id, UserId userId, String fullName, int reservedSeats, Range<LocalDateTime> reservationTime) {
     }
 }

@@ -13,8 +13,10 @@ import com.y9vad9.restaurant.domain.system.types.Range;
 import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 import com.y9vad9.restaurant.domain.tables.types.Table;
+import com.y9vad9.restaurant.domain.utils.ListUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,26 +27,32 @@ import java.util.concurrent.CompletableFuture;
 public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeState.Data> {
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(IncomingMessage prevIntent, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
-        Strings strings = context.getElement(Strings.KEY);
-        TablesRepository tablesRepository = context.getElement(TablesRepository.KEY);
-        SystemRepository systemRepository = context.getElement(SystemRepository.KEY);
-        Schedule schedule = systemRepository.getSchedule();
+        final var strings = context.getElement(Strings.KEY);
+        final var tablesRepository = context.getElement(TablesRepository.KEY);
+        final var systemRepository = context.getElement(SystemRepository.KEY);
+        final var schedule = systemRepository.getSchedule();
 
         return tablesRepository.getAvailableTime(
             data().guestsNumber(),
-            parsed(schedule.from(LocalDate.now(systemRepository.getZoneId()).getDayOfWeek()))
+            parsed(schedule.from(data().date().getDayOfWeek()))
         ).thenApply(ranges -> {
-            List<String> buttons = ranges
-                .stream()
-                .map(range -> getReservationTimes(range.first(), range.last()))
-                .flatMap(list -> list.stream().map(array -> array[0] + " – " + array[1]))
-                .toList();
+            final var timeButtons = ListUtils.makeRows(
+                ranges
+                    .stream()
+                    .map(range -> getReservationTimes(range.first(), range.last()))
+                    .flatMap(list -> list.stream().map(array -> array[0] + " – " + array[1]))
+                    .toList(),
+                3
+            );
+
+            final var buttonRows = new ArrayList<>(timeButtons);
+            buttonRows.add(List.of(strings.getCancelTitle()));
 
             sendAction.execute(
                 new BotAnswer(
                     prevIntent.userId(),
                     strings.getWriteEnterTimeMessage(),
-                    List.of(buttons, List.of(strings.getCancelTitle()))
+                    buttonRows
                 )
             );
 
@@ -55,6 +63,7 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onIntent(IncomingMessage message, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
         String input = message.message();
+        System.out.println(input);
 
         Strings strings = context.getElement(Strings.KEY);
         TablesRepository tablesRepository = context.getElement(TablesRepository.KEY);
@@ -65,7 +74,7 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
             return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
         }
 
-        Range<LocalTime> reservationTime;
+        Range<LocalDateTime> reservationTime;
 
         try {
             reservationTime = parsed(input);
@@ -76,39 +85,56 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
         }
 
         // TODO finish validation and saving
-        tablesRepository.getFreeTables(data().date, reservationTime)
+        return tablesRepository.getFreeTables(data().guestsNumber(), reservationTime)
+            .exceptionally(throwable -> {
+                sendAction.execute(new BotAnswer(message.userId(), strings.getNoTablesAvailableMessage()));
+                return null;
+            })
             .thenApply(list -> {
                 if (!list.isEmpty()) {
-                    Table table = new Table(
-                        Optional.of(new Table.Reservation(message.userId(), data().name, reservationTime)),
+                    final var table = new Table(
+                        Optional.of(new Table.Reservation(-1, message.userId(), data().name(), data.guestsNumber(), reservationTime)),
                         list.getFirst().number(), data().guestsNumber
                     );
-                    tablesRepository.addOrFail(
-                        table
-                    );
 
-                    sendAction.execute(
-                        new BotAnswer(
-                            message.userId(),
-                            strings.getSuccessfulBookingMessage(table)
-                        )
-                    );
+                    tablesRepository.setTableReserved(
+                        table.number(),
+                        table.reservation().get()
+                    ).exceptionally(throwable -> {
+                        throwable.printStackTrace();
+                        return null;
+                    }).thenApply(
+                        reservationId -> {
+                            Table.Reservation oldReservation = table.reservation().get();
 
-                    return MainMenuState.INSTANCE;
+                            sendAction.execute(
+                                new BotAnswer(
+                                    message.userId(),
+                                    strings.getSuccessfulBookingMessage(
+                                        new Table(
+                                            Optional.of(new Table.Reservation(reservationId, oldReservation.userId(), oldReservation.fullName(), oldReservation.reservedSeats(), oldReservation.reservationTime())),
+                                            table.number(),
+                                            table.seats()
+                                        )
+                                    )
+                                )
+                            );
+                            return null;
+                        }
+                    );
                 } else {
-                    return this;
+                    sendAction.execute(new BotAnswer(message.userId(), strings.getNoTablesAvailableMessage()));
                 }
+                return MainMenuState.INSTANCE;
             });
-
-        return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
     }
 
-    private Range<LocalTime> parsed(String schedule) {
+    private Range<LocalDateTime> parsed(String schedule) {
         String[] split = schedule.trim().split("[-–—]");
         List<String[]> parts = Arrays.stream(split).map(part -> part.split(":")).toList();
-        LocalTime startTime = LocalTime.of(Integer.parseInt(parts.get(0)[0]), Integer.parseInt(parts.get(0)[1]));
-        LocalTime endTime = LocalTime.of(Integer.parseInt(parts.get(1)[0]), Integer.parseInt(parts.get(1)[1]));
-        return new Range<>(startTime, endTime);
+        LocalTime startTime = LocalTime.of(Integer.parseInt(parts.get(0)[0].trim()), Integer.parseInt(parts.get(0)[1].trim()));
+        LocalTime endTime = LocalTime.of(Integer.parseInt(parts.get(1)[0].trim()), Integer.parseInt(parts.get(1)[1].trim()));
+        return new Range<>(data.date().atTime(startTime), data.date().atTime(endTime));
     }
 
     private List<String[]> getReservationTimes(LocalTime beginTime, LocalTime endTime) {
