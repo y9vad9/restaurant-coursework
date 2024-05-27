@@ -46,8 +46,9 @@ public record AdminMenuState(Void data) implements BotState<Void> {
             return CompletableFuture.completedFuture(EnterYourNameState.INSTANCE);
         } else if (text.equals(strings.getReservationsListAdmin())) {
             return CompletableFuture.completedFuture(AdminReservationsListState.INSTANCE);
+        } else {
+            sendAction.execute(new BotAnswer(message.userId(), strings.getUnknownCommandMessage()));
+            return CompletableFuture.completedFuture(this);
         }
-
-        return null;
     }
 }
