@@ -222,7 +222,7 @@ public final class UkrainianStrings implements Strings {
                     return "<b> • Столик №" + table.number() + "</b>" +
                         "\n     Номер бронювання: " + reservation.id() +
                         "\n     На ім'я: " + reservation.fullName() +
-                        "\n     Гостей " + table.seats() +
+                        "\n     Гостей: " + table.seats() +
                         "\n     Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
                         "\n     Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                 })
