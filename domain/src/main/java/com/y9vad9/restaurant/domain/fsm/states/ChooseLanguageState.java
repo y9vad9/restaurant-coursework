@@ -63,6 +63,7 @@ public record ChooseLanguageState(Void data) implements BotState<Void> {
         }
 
         languageConsumer.consume(message.userId(), strings);
+        sendAction.execute(new BotAnswer(message.userId(), strings.getHelloMessage()));
 
         return CompletableFuture.completedFuture(new MainMenuState(new MainMenuState.Data(Optional.of(strings))));
     }

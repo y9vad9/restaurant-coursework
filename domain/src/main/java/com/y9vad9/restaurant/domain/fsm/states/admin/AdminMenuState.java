@@ -42,7 +42,7 @@ public record AdminMenuState(Data data) implements BotState<AdminMenuState.Data>
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        Strings strings = context.getElement(Strings.KEY);
+        Strings strings = data().localeOverride.orElseGet(() -> context.getElement(Strings.KEY));
         String text = message.message();
 
         if (text.equals(strings.getBookTableTitle())) {

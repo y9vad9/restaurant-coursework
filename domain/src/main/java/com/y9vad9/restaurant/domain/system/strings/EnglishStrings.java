@@ -36,6 +36,11 @@ public final class EnglishStrings implements Strings {
     }
 
     @Override
+    public String getMainMenuMessage() {
+        return "Main menu:";
+    }
+
+    @Override
     public String getInvalidInputMessage() {
         return "Invalid input.";
     }
@@ -121,7 +126,7 @@ public final class EnglishStrings implements Strings {
                             return "<b> • Table No." + table.number() + "</b>" +
                                     "\n     Booking ID: " + reservation.id() +
                                     "\n     Name: " + reservation.fullName() +
-                                    "\n     Guests: " + table.seats() +
+                                    "\n     Guests number: " + table.seats() +
                                     "\n     Time: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
                                     "\n     Date: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                         })

@@ -1,6 +1,5 @@
 package com.y9vad9.restaurant.data.users.provider;
 
-import com.y9vad9.restaurant.db.generated.tables.Locales;
 import com.y9vad9.restaurant.domain.system.strings.EnglishStrings;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.strings.UkrainianStrings;
@@ -26,15 +25,17 @@ public class DbUsersLocaleProvider implements UsersLocaleProvider {
     public CompletableFuture<Strings> provide(UserId userId) {
         return CompletableFuture.supplyAsync(
             () -> context.select(LOCALES.asterisk())
-                    .from(LOCALES)
-                    .where(LOCALES.USER_ID.eq(userId.toString()))
-                    .fetchOne(LOCALES.LANG_CODE),
+                .from(LOCALES)
+                .where(LOCALES.USER_ID.eq(userId.toString()))
+                .fetchOne(LOCALES.LANG_CODE),
             executorService
         ).thenApply(code -> {
             if (code == null || UkrainianStrings.INSTANCE.getLocale().getLanguage().equals(code)) {
                 return UkrainianStrings.INSTANCE;
-            } else {
+            } else if (EnglishStrings.INSTANCE.getLocale().getLanguage().equals(code)) {
                 return EnglishStrings.INSTANCE;
+            } else {
+                throw new IllegalArgumentException("Invalid language code: " + code);
             }
         });
     }

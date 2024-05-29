@@ -21,6 +21,7 @@ public class DbUsersLocaleConsumer implements UsersLocaleConsumer {
 
     @Override
     public Future<Integer> consume(UserId userId, Strings strings) {
+        System.out.println(strings);
         String code = strings.getLocale().getLanguage();
         return executorService.submit(
             () -> context

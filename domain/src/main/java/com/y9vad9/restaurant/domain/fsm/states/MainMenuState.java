@@ -37,7 +37,7 @@ public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
         if (systemRepository.getAdmins().stream().anyMatch(id -> prevIntent.userId().equals(id)))
             return CompletableFuture.completedFuture(new AdminMenuState(new AdminMenuState.Data(Optional.of(strings))));
 
-        sendAction.execute(new BotAnswer(prevIntent.userId(), strings.getHelloMessage(), menuButtons(strings)));
+        sendAction.execute(new BotAnswer(prevIntent.userId(), strings.getMainMenuMessage(), menuButtons(strings)));
         return BotState.super.onEnter(prevIntent, sendAction, context);
     }
 
@@ -51,7 +51,7 @@ public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
             .executor();
         final var systemRepository = context.getElement(SystemRepository.KEY);
         final var tablesRepository = context.getElement(TablesRepository.KEY);
-        final var strings = context.getElement(Strings.KEY);
+        final var strings = data().localeOverride().orElseGet(() -> context.getElement(Strings.KEY));
 
         return CompletableFuture.supplyAsync(
             () -> handleCommand(

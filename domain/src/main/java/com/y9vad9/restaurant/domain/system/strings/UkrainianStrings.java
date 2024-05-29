@@ -36,6 +36,11 @@ public final class UkrainianStrings implements Strings {
     }
 
     @Override
+    public String getMainMenuMessage() {
+        return "Головне меню:";
+    }
+
+    @Override
     public String getInvalidInputMessage() {
         return "Неправильно введені дані.";
     }
@@ -75,18 +80,18 @@ public final class UkrainianStrings implements Strings {
     @Override
     public String getContactsMessage(Contacts contacts) {
         StringBuilder builder = new StringBuilder()
-            .append("Наші контактні дані:")
+            .append("<b>Наші контактні дані:</b>")
             .append("\n");
 
         switch (contacts.phoneNumbers().size()) {
             case 0:
                 break;
             case 1:
-                builder.append("Номер телефону: ").append(contacts.phoneNumbers().getFirst()).append("\n");
+                builder.append("    • Номер телефону: ").append(contacts.phoneNumbers().getFirst()).append("\n");
                 break;
             default:
                 String numbers = String.join(", ", contacts.phoneNumbers());
-                builder.append("Номери телефону: ").append(numbers).append("\n");
+                builder.append("    • Номери телефону: ").append(numbers).append("\n");
                 break;
         }
 
@@ -94,15 +99,15 @@ public final class UkrainianStrings implements Strings {
             case 0:
                 break;
             case 1:
-                builder.append("Електронна адреса: ").append(contacts.emailAddresses().getFirst()).append("\n");
+                builder.append("    • Електронна адреса: ").append(contacts.emailAddresses().getFirst()).append("\n");
                 break;
             default:
                 String addresses = String.join(", ", contacts.emailAddresses());
-                builder.append("Електронні адреси: ").append(addresses).append("\n");
+                builder.append("    • Електронні адреси: ").append(addresses).append("\n");
                 break;
         }
 
-        builder.append("Адреса: ").append(contacts.address());
+        builder.append("    • Адреса: ").append(contacts.address());
         return builder.toString();
     }
 
@@ -121,7 +126,7 @@ public final class UkrainianStrings implements Strings {
                     return "<b> • Столик №" + table.number() + "</b>" +
                         "\n     Номер бронювання: " + reservation.id() +
                         "\n     На ім'я: " + reservation.fullName() +
-                        "\n     Гостей " + table.seats() +
+                        "\n     Гостей: " + table.seats() +
                         "\n     Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
                         "\n     Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                 })
@@ -164,11 +169,11 @@ public final class UkrainianStrings implements Strings {
         Table.Reservation reservation = table.reservation().orElseThrow();
         Range<LocalDateTime> reservationTime = reservation.reservationTime();
         return "Успішно заброньовано! Ваше бронювання:\n" +
-            "Номер бронювання: " + reservation.id() + ".\n" +
-            "Номер столику: " + table.number() + ".\n" +
-            "Ім'я: " + reservation.fullName() + ".\n" +
-            "Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() + ".\n" +
-            "Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ".";
+            "   • Номер бронювання: " + reservation.id() + ".\n" +
+            "   • Номер столику: " + table.number() + ".\n" +
+            "   • Ім'я: " + reservation.fullName() + ".\n" +
+            "   • Час: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() + ".\n" +
+            "   • Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ".";
     }
 
     @Override
