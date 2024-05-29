@@ -3,6 +3,7 @@ package com.y9vad9.restaurant.initializers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.y9vad9.restaurant.ApplicationDefaults;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.entities.Config;
@@ -28,6 +29,7 @@ public final class ConfigInitializer {
         File adminListFile = new File(workingDir, "admins.json");
 
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         if (!contactsFile.exists()) {
@@ -59,6 +61,6 @@ public final class ConfigInitializer {
         List<TableCapacity> capacities = objectMapper.readValue(tablesCapacitiesFile, new TypeReference<>() {});
         List<UserId> adminList = objectMapper.readValue(adminListFile, new TypeReference<>() {});
 
-        return new Config(schedule, contacts, capacities, adminList);
+        return new Config(schedule, contacts, capacities, adminList, objectMapper);
     }
 }

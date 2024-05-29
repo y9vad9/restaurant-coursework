@@ -7,7 +7,6 @@ import com.y9vad9.jfsm.functions.SendActionFunction;
 import com.y9vad9.jfsm.storage.StateStorage;
 import com.y9vad9.restaurant.domain.fsm.BotAnswer;
 import com.y9vad9.restaurant.domain.fsm.IncomingMessage;
-import com.y9vad9.restaurant.domain.fsm.states.InitialState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
@@ -27,12 +26,15 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.time.Duration;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class TelegramBotConsumer implements LongPollingSingleThreadUpdateConsumer {
     private TelegramClient telegramClient;
 
-    private final FSMManager<Long, IncomingMessage, BotAnswer> fsmManager;
+    private final FSMManager<UserId, IncomingMessage, BotAnswer> fsmManager;
     private final FSMContext globalContext;
     private final UsersLocaleProvider localeProvider;
 
@@ -42,12 +44,13 @@ public class TelegramBotConsumer implements LongPollingSingleThreadUpdateConsume
         SystemRepository repository,
         TablesRepository tablesRepository,
         UsersLocaleProvider localeProvider,
-        UsersLocaleConsumer localeConsumer
+        UsersLocaleConsumer localeConsumer,
+        StateStorage<UserId> stateStorage
     ) {
         Executor executor = new ThreadPoolExecutor(8, 12, Long.MAX_VALUE, TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>());
 
         this.fsmManager = new FSMManager<>(
-            StateStorage.inMemory(key -> InitialState.INSTANCE),
+            stateStorage,
             Duration.ofMinutes(10),
             500,
             executor
@@ -71,7 +74,9 @@ public class TelegramBotConsumer implements LongPollingSingleThreadUpdateConsume
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            fsmManager.getStateMachine(update.getMessage().getChatId())
+            final var intent = mapFromUpdate(update);
+
+            fsmManager.getStateMachine(intent.userId())
                 .thenAccept(
                     fsm -> localeProvider.provide(
                         new UserId(

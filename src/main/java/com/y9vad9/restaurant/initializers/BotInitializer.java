@@ -23,7 +23,8 @@ public class BotInitializer {
                     dependencies.systemRepository(),
                     dependencies.tablesRepository(),
                     dependencies.localeProvider(),
-                    dependencies.localeConsumer()
+                    dependencies.localeConsumer(),
+                    dependencies.stateStorage()
                 );
                 botsApplication.registerBot(dependencies.apiToken(), botConsumer).start();
                 System.out.println("Бот розпочав свою роботу успішно.");

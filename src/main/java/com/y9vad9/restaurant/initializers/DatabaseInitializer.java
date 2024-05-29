@@ -4,7 +4,6 @@ import com.y9vad9.restaurant.cli.Arguments;
 import com.y9vad9.restaurant.entities.Config;
 import com.y9vad9.restaurant.entities.TableCapacity;
 import org.jooq.DSLContext;
-import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 
 import java.sql.DriverManager;
@@ -13,6 +12,7 @@ import java.util.List;
 
 import static com.y9vad9.restaurant.db.generated.tables.Locales.LOCALES;
 import static com.y9vad9.restaurant.db.generated.tables.Reservation.RESERVATION;
+import static com.y9vad9.restaurant.db.generated.tables.States.STATES;
 import static com.y9vad9.restaurant.db.generated.tables.Tables.TABLES;
 
 public final class DatabaseInitializer {
@@ -46,8 +46,13 @@ public final class DatabaseInitializer {
             .execute();
 
         dslContext.createTableIfNotExists(LOCALES)
-            .column(LOCALES.LANG_CODE)
             .column(LOCALES.USER_ID)
+            .column(LOCALES.LANG_CODE)
+            .execute();
+
+        dslContext.createTableIfNotExists(STATES)
+            .column(STATES.USER_ID)
+            .column(STATES.JSON_VALUE)
             .execute();
     }
 

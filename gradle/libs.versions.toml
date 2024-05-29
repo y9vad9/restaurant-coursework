@@ -21,7 +21,10 @@ caching-caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.require = "24.0.0" }
 
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-core-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
 jackson-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson" }
+
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 
 persistance-eclipselink = { module = "org.eclipse.persistence:eclipselink", version.require = "4.0.2" }
 

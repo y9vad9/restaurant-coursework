@@ -14,6 +14,8 @@ dependencies {
     jooqCodegen(libs.jooq.meta)
 
     implementation(libs.persistance.eclipselink)
+
+    implementation(libs.jackson.core)
 }
 
 val jooqOutputDir = "build/generated/jooq"
