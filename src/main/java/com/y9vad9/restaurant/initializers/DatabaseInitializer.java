@@ -52,9 +52,6 @@ public final class DatabaseInitializer {
     }
 
     private static void createTableEntitiesFromConfig(DSLContext context, List<TableCapacity> capacities) {
-        // TODO deletes reservations SHOULD BE FIXED
-        context.deleteFrom(TABLES).execute();
-
         final var queries = capacities.stream().map(
             capacity -> context.insertInto(TABLES, TABLES.NUMBER, TABLES.SEATS)
                 .values(capacity.number(), capacity.availableSeats())
@@ -63,5 +60,9 @@ public final class DatabaseInitializer {
         ).toList();
 
         context.batch(queries).execute();
+
+        context.deleteFrom(TABLES)
+            .where(TABLES.NUMBER.notIn(capacities.stream().map(TableCapacity::number).toList()))
+            .execute();
     }
 }
