@@ -6,6 +6,7 @@ import com.y9vad9.jfsm.functions.SendActionFunction;
 import com.y9vad9.restaurant.domain.fsm.BotAnswer;
 import com.y9vad9.restaurant.domain.fsm.BotState;
 import com.y9vad9.restaurant.domain.fsm.IncomingMessage;
+import com.y9vad9.restaurant.domain.fsm.states.ChooseLanguageState;
 import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterYourNameState;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 
@@ -31,7 +32,10 @@ public record AdminMenuState(Data data) implements BotState<AdminMenuState.Data>
             new BotAnswer(
                 prevIntent.userId(),
                 strings.getAdminHelloMessage(),
-                List.of(List.of(strings.getBookTableTitle(), strings.getReservationsListAdmin()))
+                List.of(
+                    List.of(strings.getBookTableTitle(), strings.getReservationsListAdmin()),
+                    List.of(strings.getChangeLanguageTitle())
+                )
             )
         );
         return CompletableFuture.completedFuture(this);
@@ -50,6 +54,8 @@ public record AdminMenuState(Data data) implements BotState<AdminMenuState.Data>
             return CompletableFuture.completedFuture(EnterYourNameState.INSTANCE);
         } else if (text.equals(strings.getReservationsListAdmin())) {
             return CompletableFuture.completedFuture(AdminReservationsListState.INSTANCE);
+        } else if (text.equals(strings.getChangeLanguageTitle())) {
+            return CompletableFuture.completedFuture(ChooseLanguageState.INSTANCE);
         } else {
             sendAction.execute(new BotAnswer(message.userId(), strings.getUnknownCommandMessage()));
             return CompletableFuture.completedFuture(this);

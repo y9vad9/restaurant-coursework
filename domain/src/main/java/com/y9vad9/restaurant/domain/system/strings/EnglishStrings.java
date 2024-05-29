@@ -46,6 +46,11 @@ public final class EnglishStrings implements Strings {
     }
 
     @Override
+    public String getChangeLanguageTitle() {
+        return "Change language / Змінити мову";
+    }
+
+    @Override
     public String getBookTableTitle() {
         return "📝 Book a Table";
     }
@@ -87,11 +92,11 @@ public final class EnglishStrings implements Strings {
             case 0:
                 break;
             case 1:
-                builder.append("Phone number: ").append(contacts.phoneNumbers().getFirst()).append("\n");
+                builder.append("    • Phone number: ").append(contacts.phoneNumbers().getFirst()).append("\n");
                 break;
             default:
                 String numbers = String.join(", ", contacts.phoneNumbers());
-                builder.append("Phone numbers: ").append(numbers).append("\n");
+                builder.append("    • Phone numbers: ").append(numbers).append("\n");
                 break;
         }
 
@@ -99,15 +104,15 @@ public final class EnglishStrings implements Strings {
             case 0:
                 break;
             case 1:
-                builder.append("Email address: ").append(contacts.emailAddresses().getFirst()).append("\n");
+                builder.append("    • Email address: ").append(contacts.emailAddresses().getFirst()).append("\n");
                 break;
             default:
                 String addresses = String.join(", ", contacts.emailAddresses());
-                builder.append("Email addresses: ").append(addresses).append("\n");
+                builder.append("    • Email addresses: ").append(addresses).append("\n");
                 break;
         }
 
-        builder.append("Address: ").append(contacts.address());
+        builder.append("    • Address: ").append(contacts.address());
         return builder.toString();
     }
 
@@ -169,11 +174,11 @@ public final class EnglishStrings implements Strings {
         Table.Reservation reservation = table.reservation().orElseThrow();
         Range<LocalDateTime> reservationTime = reservation.reservationTime();
         return "Successfully booked! Your booking:\n" +
-            "Booking ID: " + reservation.id() + ".\n" +
-            "Table Number: " + table.number() + ".\n" +
-            "Name: " + reservation.fullName() + ".\n" +
-            "Time: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() + ".\n" +
-            "Date: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + ".";
+            " • Booking ID: " + reservation.id() + ".\n" +
+            " • Table Number: " + table.number() + ".\n" +
+            " • Name: " + reservation.fullName() + ".\n" +
+            " • Time: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() + ".\n" +
+            " • Date: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + ".";
     }
 
     @Override
@@ -203,8 +208,7 @@ public final class EnglishStrings implements Strings {
 
     @Override
     public String getAdminHelloMessage() {
-        return "Welcome to the administrator panel. Here you can view guest reservations" +
-            " and manually book if the booking is done via phone.";
+        return "Admin menu:";
     }
 
     @Override

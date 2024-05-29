@@ -90,6 +90,8 @@ public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
             messageText = strings.getContactsMessage(systemRepository.getContacts());
         } else if (command.equals(strings.getWhenWeWorkTitle())) {
             messageText = strings.getWhenWeWorkMessage(systemRepository.getSchedule());
+        } else if(command.equals(strings.getChangeLanguageTitle())) {
+            return ChooseLanguageState.INSTANCE;
         } else {
             messageText = strings.getUnknownCommandMessage();
         }
@@ -106,7 +108,8 @@ public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
     private static List<List<String>> menuButtons(Strings strings) {
         return List.of(
             List.of(strings.getBookTableTitle(), strings.getBookedTablesTitle()),
-            List.of(strings.getContactsTitle(), strings.getWhenWeWorkTitle())
+            List.of(strings.getContactsTitle(), strings.getWhenWeWorkTitle()),
+            List.of(strings.getChangeLanguageTitle())
         );
     }
 }

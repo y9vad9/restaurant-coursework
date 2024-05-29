@@ -46,6 +46,11 @@ public final class UkrainianStrings implements Strings {
     }
 
     @Override
+    public String getChangeLanguageTitle() {
+        return "Змінити мову / Change language";
+    }
+
+    @Override
     public String getBookTableTitle() {
         return "📝 Забронювати столик";
     }
@@ -203,8 +208,7 @@ public final class UkrainianStrings implements Strings {
 
     @Override
     public String getAdminHelloMessage() {
-        return "Наразі ви перебуваєте в ролі Адміністратора. Тут ви можете переглядати бронювання" +
-            " гостей та саморучно бронювати, якщо бронювання відбувається через телефон.";
+        return "Меню адміністратора:";
     }
 
     @Override

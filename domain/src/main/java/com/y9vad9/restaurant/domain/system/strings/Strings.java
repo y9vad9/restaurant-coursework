@@ -34,6 +34,8 @@ public sealed interface Strings extends FSMContextElement permits EnglishStrings
 
     String getInvalidInputMessage();
 
+    String getChangeLanguageTitle();
+
     @Override
     default Key<?> key() {
         return KEY;
