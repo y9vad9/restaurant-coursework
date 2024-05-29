@@ -54,15 +54,21 @@ public record EnterEntryDateState(Data data) implements BotState<EnterEntryDateS
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        String input = message.message().substring(0, message.message().indexOf("(")).trim();
         Strings strings = context.getElement(Strings.KEY);
+
+        if (message.message().equals(strings.getCancelTitle())) {
+            return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
+        }
+
+        int indexOfDisplay = message.message().indexOf("(");
+        if (indexOfDisplay <= 0) {
+            sendAction.execute(new BotAnswer(message.userId(), strings.getInvalidInputMessage()));
+        }
+
+        String input = message.message().substring(0, indexOfDisplay).trim();
         Schedule schedule = context
             .getElement(SystemRepository.KEY)
             .getSchedule();
-
-        if (input.equals(strings.getCancelTitle())) {
-            return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
-        }
 
         if (input.matches(DateUtils.DATE_REGEX)) {
             LocalDate localDate = DateUtils.parseDate(input);

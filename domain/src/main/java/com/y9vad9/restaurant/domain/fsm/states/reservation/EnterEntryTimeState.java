@@ -67,8 +67,6 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
 
         Strings strings = context.getElement(Strings.KEY);
         TablesRepository tablesRepository = context.getElement(TablesRepository.KEY);
-        SystemRepository systemRepository = context.getElement(SystemRepository.KEY);
-        Schedule schedule = systemRepository.getSchedule();
 
         if (input.equals(strings.getCancelTitle())) {
             return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
@@ -84,7 +82,6 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
             return CompletableFuture.completedFuture(this);
         }
 
-        // TODO finish validation and saving
         return tablesRepository.getFreeTables(data().guestsNumber(), reservationTime)
             .exceptionally(throwable -> {
                 sendAction.execute(new BotAnswer(message.userId(), strings.getNoTablesAvailableMessage()));
@@ -100,10 +97,7 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
                     tablesRepository.setTableReserved(
                         table.number(),
                         table.reservation().get()
-                    ).exceptionally(throwable -> {
-                        throwable.printStackTrace();
-                        return null;
-                    }).thenApply(
+                    ).thenApply(
                         reservationId -> {
                             Table.Reservation oldReservation = table.reservation().get();
 
@@ -121,7 +115,7 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
                             );
                             return null;
                         }
-                    );
+                    ).join();
                 } else {
                     sendAction.execute(new BotAnswer(message.userId(), strings.getNoTablesAvailableMessage()));
                 }
