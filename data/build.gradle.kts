@@ -13,8 +13,6 @@ dependencies {
     implementation(libs.jooq.core)
     jooqCodegen(libs.jooq.meta)
 
-    implementation(libs.persistance.eclipselink)
-
     implementation(libs.jackson.core)
 }
 

@@ -1,14 +1,9 @@
 [versions]
-javalin = "6.1.3"
-retrofit = "2.11.0"
 rxjava = "3.1.8"
 jackson = "2.17.0"
 jooq = "3.19.8"
 
 [libraries]
-## Retrofit залежності
-retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-
 ## RxJava
 rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava" }
 
@@ -26,8 +21,6 @@ jackson-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
 jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-
-persistance-eclipselink = { module = "org.eclipse.persistence:eclipselink", version.require = "4.0.2" }
 
 jooq-core = { module = "org.jooq:jooq", version.ref = "jooq" }
 jooq-meta = { module = "org.jooq:jooq-meta-extensions", version.ref = "jooq" }

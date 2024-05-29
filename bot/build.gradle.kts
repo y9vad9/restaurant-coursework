@@ -8,7 +8,5 @@ dependencies {
     implementation(libs.rubenlagus.telegramClientApi)
     implementation(libs.jackson.core)
 
-    implementation(libs.persistance.eclipselink)
-
     implementation(projects.domain)
 }
