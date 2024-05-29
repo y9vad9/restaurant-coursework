@@ -62,7 +62,7 @@ public class DbTablesRepository implements TablesRepository {
                 .join(TABLES)
                 .on(TABLES.NUMBER.eq(RESERVATION.TABLE_ID))
                 .where(
-                    RESERVATION.TIME_START.lessOrEqual(timeRange.first())
+                    RESERVATION.TIME_START.greaterOrEqual(timeRange.first())
                         .and(RESERVATION.TIME_END.lessOrEqual(timeRange.last()))
                         .or(RESERVATION.TIME_START.between(timeRange.first(), timeRange.last()))
                         .or(RESERVATION.TIME_END.between(timeRange.first(), timeRange.last()))
