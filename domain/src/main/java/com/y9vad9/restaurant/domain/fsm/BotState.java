@@ -7,6 +7,7 @@ import com.y9vad9.restaurant.domain.fsm.states.ChooseLanguageState;
 import com.y9vad9.restaurant.domain.fsm.states.InitialState;
 import com.y9vad9.restaurant.domain.fsm.states.MainMenuState;
 import com.y9vad9.restaurant.domain.fsm.states.admin.AdminMenuState;
+import com.y9vad9.restaurant.domain.fsm.states.admin.AdminReservationsListState;
 import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterEntryDateState;
 import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterEntryTimeState;
 import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterGuestsNumberState;
@@ -21,6 +22,7 @@ import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterYourNameState;
     @JsonSubTypes.Type(value = MainMenuState.class, name = "main_menu"),
     @JsonSubTypes.Type(value = ChooseLanguageState.class, name = "choose_language"),
     @JsonSubTypes.Type(value = AdminMenuState.class, name = "admin_menu"),
+    @JsonSubTypes.Type(value = AdminReservationsListState.class, name = "admin_reservations_list"),
     @JsonSubTypes.Type(value = MainMenuState.class, name = "admin_reservations_list"),
     @JsonSubTypes.Type(value = EnterEntryDateState.class, name = "enter_entry_date"),
     @JsonSubTypes.Type(value = EnterEntryTimeState.class, name = "enter_entry_time"),
