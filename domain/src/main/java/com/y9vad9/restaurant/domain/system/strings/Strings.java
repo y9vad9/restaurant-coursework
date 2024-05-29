@@ -13,6 +13,8 @@ public interface Strings extends FSMContextElement {
 
     Locale getLocale();
 
+    String getLanguageDisplayTitle();
+
     String getUnknownCommandMessage();
 
     String getHelloMessage();
@@ -73,4 +75,6 @@ public interface Strings extends FSMContextElement {
     String getReservationCanceledRegular();
 
     String getReservationCanceled(Table.Reservation reservation, String reason);
+
+    String getChooseLanguageMessage();
 }

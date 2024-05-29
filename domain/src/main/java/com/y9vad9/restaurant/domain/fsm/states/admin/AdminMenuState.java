@@ -10,10 +10,13 @@ import com.y9vad9.restaurant.domain.fsm.states.reservation.EnterYourNameState;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public record AdminMenuState(Void data) implements BotState<Void> {
-    public static final AdminMenuState INSTANCE = new AdminMenuState(null);
+public record AdminMenuState(Data data) implements BotState<AdminMenuState.Data> {
+    public static final AdminMenuState INSTANCE = new AdminMenuState(new Data(Optional.empty()));
+
+    public record Data(Optional<Strings> localeOverride) {}
 
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(
@@ -21,7 +24,7 @@ public record AdminMenuState(Void data) implements BotState<Void> {
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        Strings strings = context.getElement(Strings.KEY);
+        Strings strings = data().localeOverride().orElseGet(() -> context.getElement(Strings.KEY));
 
         sendAction.execute(
             new BotAnswer(

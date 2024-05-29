@@ -20,6 +20,11 @@ public final class UkrainianStrings implements Strings {
     }
 
     @Override
+    public String getLanguageDisplayTitle() {
+        return "🇺🇦 Українська";
+    }
+
+    @Override
     public String getUnknownCommandMessage() {
         return "Невідома команда.";
     }
@@ -239,5 +244,10 @@ public final class UkrainianStrings implements Strings {
     @Override
     public String getReservationCanceled(Table.Reservation reservation, String reason) {
         return "Нажаль, ваше бронювання було скасовано: " + reason + ".";
+    }
+
+    @Override
+    public String getChooseLanguageMessage() {
+        return "Оберіть будь-ласка мову:";
     }
 }

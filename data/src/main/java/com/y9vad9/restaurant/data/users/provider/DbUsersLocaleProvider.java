@@ -1,6 +1,7 @@
 package com.y9vad9.restaurant.data.users.provider;
 
 import com.y9vad9.restaurant.db.generated.tables.Locales;
+import com.y9vad9.restaurant.domain.system.strings.EnglishStrings;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.strings.UkrainianStrings;
 import com.y9vad9.restaurant.domain.system.types.UserId;
@@ -33,7 +34,7 @@ public class DbUsersLocaleProvider implements UsersLocaleProvider {
             if (code == null || UkrainianStrings.INSTANCE.getLocale().getLanguage().equals(code)) {
                 return UkrainianStrings.INSTANCE;
             } else {
-                throw new RuntimeException("Unavailable at the moment");
+                return EnglishStrings.INSTANCE;
             }
         });
     }

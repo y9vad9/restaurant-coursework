@@ -24,6 +24,6 @@ public class InitialState implements BotState<Void> {
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
+        return CompletableFuture.completedFuture(ChooseLanguageState.INSTANCE);
     }
 }

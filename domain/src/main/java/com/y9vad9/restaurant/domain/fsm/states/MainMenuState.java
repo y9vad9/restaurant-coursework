@@ -14,11 +14,16 @@ import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class MainMenuState implements BotState<Void> {
-    public static MainMenuState INSTANCE = new MainMenuState();
+public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
+    public static MainMenuState INSTANCE = new MainMenuState(
+        new Data(Optional.empty())
+    );
+
+    record Data(Optional<Strings> localeOverride) {}
 
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(
@@ -26,19 +31,14 @@ public class MainMenuState implements BotState<Void> {
         SendActionFunction<BotAnswer> sendAction,
         FSMContext context
     ) {
-        Strings strings = context.getElement(Strings.KEY);
+        Strings strings = data().localeOverride().orElseGet(() -> context.getElement(Strings.KEY));
         SystemRepository systemRepository = context.getElement(SystemRepository.KEY);
 
         if (systemRepository.getAdmins().stream().anyMatch(id -> prevIntent.userId().equals(id)))
-            return CompletableFuture.completedFuture(AdminMenuState.INSTANCE);
+            return CompletableFuture.completedFuture(new AdminMenuState(new AdminMenuState.Data(Optional.of(strings))));
 
         sendAction.execute(new BotAnswer(prevIntent.userId(), strings.getHelloMessage(), menuButtons(strings)));
         return BotState.super.onEnter(prevIntent, sendAction, context);
-    }
-
-    @Override
-    public Void data() {
-        return null;
     }
 
     @Override
