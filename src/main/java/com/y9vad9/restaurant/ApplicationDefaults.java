@@ -27,12 +27,7 @@ public class ApplicationDefaults {
     public static final List<TableCapacity> TABLE_CAPACITY_LIST = List.of(
         new TableCapacity(1, 4),
         new TableCapacity(2, 3),
-        new TableCapacity(3, 2),
-        new TableCapacity(4, 4),
-        new TableCapacity(1, 4),
-        new TableCapacity(2, 3),
-        new TableCapacity(3, 2),
-        new TableCapacity(4, 4)
+        new TableCapacity(3, 2)
     );
 
     public static final List<UserId> ADMIN_LIST = List.of(
