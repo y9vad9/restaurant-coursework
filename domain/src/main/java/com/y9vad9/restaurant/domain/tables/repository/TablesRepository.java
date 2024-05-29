@@ -6,14 +6,11 @@ import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.tables.types.TableOverview;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Інтерфейс, який визначає методи для роботи з репозиторієм столів.

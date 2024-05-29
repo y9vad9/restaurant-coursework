@@ -10,7 +10,6 @@ import com.y9vad9.restaurant.domain.fsm.states.MainMenuState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.types.Range;
-import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.utils.ListUtils;

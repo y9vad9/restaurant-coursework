@@ -6,7 +6,6 @@ import com.y9vad9.jfsm.functions.SendActionFunction;
 import com.y9vad9.restaurant.domain.fsm.BotAnswer;
 import com.y9vad9.restaurant.domain.fsm.BotState;
 import com.y9vad9.restaurant.domain.fsm.IncomingMessage;
-import com.y9vad9.restaurant.domain.system.strings.Strings;
 
 import java.util.concurrent.CompletableFuture;
 

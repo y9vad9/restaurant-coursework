@@ -5,7 +5,9 @@
 ### Крок 1: Встановлення Java
 
 1. **Завантажте та встановіть Java Development Kit (JDK) версії 21:**
-    - Відвідайте офіційний сайт [Oracle JDK](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html) або [AdoptOpenJDK](https://adoptium.net/temurin/releases/).
+    - Відвідайте офіційний
+      сайт [Oracle JDK](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+      або [AdoptOpenJDK](https://adoptium.net/temurin/releases/).
     - Завантажте інсталяційний файл відповідно до вашої операційної системи (Windows, macOS, Linux).
     - Виконайте інсталяцію, дотримуючись інструкцій установника.
 
@@ -61,5 +63,6 @@
 
 ### Додаткові ресурси
 
-- Докладніше про змінні середовища: [Довідка по змінним середовища](https://www.twilio.com/docs/glossary/what-is-an-environment-variable)
+- Докладніше про змінні
+  середовища: [Довідка по змінним середовища](https://www.twilio.com/docs/glossary/what-is-an-environment-variable)
 - Налаштування бази даних PostgreSQL: [Офіційна документація PostgreSQL](https://www.postgresql.org/docs/)

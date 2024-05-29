@@ -16,7 +16,8 @@ import java.util.concurrent.CompletableFuture;
 public record AdminMenuState(Data data) implements BotState<AdminMenuState.Data> {
     public static final AdminMenuState INSTANCE = new AdminMenuState(new Data(Optional.empty()));
 
-    public record Data(Optional<Strings> localeOverride) {}
+    public record Data(Optional<Strings> localeOverride) {
+    }
 
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(

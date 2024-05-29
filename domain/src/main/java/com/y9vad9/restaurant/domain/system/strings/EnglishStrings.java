@@ -32,7 +32,7 @@ public final class EnglishStrings implements Strings {
     @Override
     public String getHelloMessage() {
         return "Welcome to our restaurant's Telegram bot! You can book a table here for your desired time, " +
-                "view your bookings, and check our working hours.";
+            "view your bookings, and check our working hours.";
     }
 
     @Override
@@ -68,20 +68,20 @@ public final class EnglishStrings implements Strings {
     @Override
     public String getWhenWeWorkMessage(Schedule schedule) {
         return "We operate according to the following schedule:\n" +
-                " • Monday: " + ((schedule.monday() == null || schedule.monday().isEmpty()) ? "Closed" : schedule.monday()) + "\n" +
-                " • Tuesday: " + ((schedule.tuesday() == null || schedule.tuesday().isEmpty()) ? "Closed" : schedule.tuesday()) + "\n" +
-                " • Wednesday: " + ((schedule.wednesday() == null || schedule.wednesday().isEmpty()) ? "Closed" : schedule.wednesday()) + "\n" +
-                " • Thursday: " + ((schedule.thursday() == null || schedule.thursday().isEmpty()) ? "Closed" : schedule.thursday()) + "\n" +
-                " • Friday: " + ((schedule.friday() == null || schedule.friday().isEmpty()) ? "Closed" : schedule.friday()) + "\n" +
-                " • Saturday: " + ((schedule.saturday() == null || schedule.saturday().isEmpty()) ? "Closed" : schedule.saturday()) + "\n" +
-                " • Sunday: " + ((schedule.sunday() == null || schedule.sunday().isEmpty()) ? "Closed" : schedule.sunday()) + "\n";
+            " • Monday: " + ((schedule.monday() == null || schedule.monday().isEmpty()) ? "Closed" : schedule.monday()) + "\n" +
+            " • Tuesday: " + ((schedule.tuesday() == null || schedule.tuesday().isEmpty()) ? "Closed" : schedule.tuesday()) + "\n" +
+            " • Wednesday: " + ((schedule.wednesday() == null || schedule.wednesday().isEmpty()) ? "Closed" : schedule.wednesday()) + "\n" +
+            " • Thursday: " + ((schedule.thursday() == null || schedule.thursday().isEmpty()) ? "Closed" : schedule.thursday()) + "\n" +
+            " • Friday: " + ((schedule.friday() == null || schedule.friday().isEmpty()) ? "Closed" : schedule.friday()) + "\n" +
+            " • Saturday: " + ((schedule.saturday() == null || schedule.saturday().isEmpty()) ? "Closed" : schedule.saturday()) + "\n" +
+            " • Sunday: " + ((schedule.sunday() == null || schedule.sunday().isEmpty()) ? "Closed" : schedule.sunday()) + "\n";
     }
 
     @Override
     public String getContactsMessage(Contacts contacts) {
         StringBuilder builder = new StringBuilder()
-                .append("Our contact details:")
-                .append("\n");
+            .append("Our contact details:")
+            .append("\n");
 
         switch (contacts.phoneNumbers().size()) {
             case 0:
@@ -118,19 +118,19 @@ public final class EnglishStrings implements Strings {
             return "You haven't booked any tables yet.";
 
         return "Your booked tables:\n\n" +
-                tables.stream()
-                        .map(table -> {
-                            final var reservation = table.reservation().get();
-                            final var reservationTime = reservation.reservationTime();
+            tables.stream()
+                .map(table -> {
+                    final var reservation = table.reservation().get();
+                    final var reservationTime = reservation.reservationTime();
 
-                            return "<b> • Table No." + table.number() + "</b>" +
-                                    "\n     Booking ID: " + reservation.id() +
-                                    "\n     Name: " + reservation.fullName() +
-                                    "\n     Guests number: " + table.seats() +
-                                    "\n     Time: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
-                                    "\n     Date: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-                        })
-                        .collect(Collectors.joining("\n"));
+                    return "<b> • Table No." + table.number() + "</b>" +
+                        "\n     Booking ID: " + reservation.id() +
+                        "\n     Name: " + reservation.fullName() +
+                        "\n     Guests number: " + table.seats() +
+                        "\n     Time: " + reservationTime.first().toLocalTime().toString() + " – " + reservationTime.last().toLocalTime() +
+                        "\n     Date: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+                })
+                .collect(Collectors.joining("\n"));
     }
 
     @Override

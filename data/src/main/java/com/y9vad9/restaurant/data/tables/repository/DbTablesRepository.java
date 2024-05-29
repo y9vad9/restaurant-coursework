@@ -1,13 +1,14 @@
 package com.y9vad9.restaurant.data.tables.repository;
 
 import com.y9vad9.restaurant.domain.system.types.Range;
-import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.tables.types.TableOverview;
-import org.jooq.*;
+import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 import static com.y9vad9.restaurant.db.generated.tables.Reservation.RESERVATION;
 import static com.y9vad9.restaurant.db.generated.tables.Tables.TABLES;
@@ -23,7 +23,6 @@ import static com.y9vad9.restaurant.db.generated.tables.Tables.TABLES;
 public class DbTablesRepository implements TablesRepository {
     final DSLContext context;
     final ExecutorService executorService;
-    Schedule schedule;
 
     public DbTablesRepository(DSLContext context, ExecutorService executorService) {
         this.context = context;
@@ -177,8 +176,6 @@ public class DbTablesRepository implements TablesRepository {
 
         return timeRanges;
     }
-
-
 
 
     @Override

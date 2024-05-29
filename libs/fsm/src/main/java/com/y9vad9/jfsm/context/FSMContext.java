@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public sealed interface FSMContext permits ImmutableFSMContext {
@@ -22,9 +21,6 @@ public sealed interface FSMContext permits ImmutableFSMContext {
         return Objects.requireNonNull(getElementOrNull(key));
     }
 
-    /**
-     * Returns copy of current FSMContext with new element.
-     */
     <E extends FSMContextElement> FSMContext assign(@NotNull E element);
 
     <E extends FSMContextElement> FSMContext assign(List<@NotNull E> elements);

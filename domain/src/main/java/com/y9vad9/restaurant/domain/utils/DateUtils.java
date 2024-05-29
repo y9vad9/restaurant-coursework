@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class DateUtils {
-    private DateUtils() {}
+    private DateUtils() {
+    }
 
     public static final String DATE_REGEX = "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.\\d{4}$";
 

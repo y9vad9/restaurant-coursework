@@ -23,7 +23,8 @@ public record MainMenuState(Data data) implements BotState<MainMenuState.Data> {
         new Data(Optional.empty())
     );
 
-    record Data(Optional<Strings> localeOverride) {}
+    record Data(Optional<Strings> localeOverride) {
+    }
 
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onEnter(

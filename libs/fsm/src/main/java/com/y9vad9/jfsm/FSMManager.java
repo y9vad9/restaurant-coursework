@@ -8,8 +8,6 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public final class FSMManager<TKey, TIntent, TAction> {
     private final StateStorage<TKey> storage;

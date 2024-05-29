@@ -2,8 +2,6 @@ package com.y9vad9.restaurant.entities;
 
 import com.y9vad9.jfsm.storage.StateStorage;
 import com.y9vad9.restaurant.cli.Arguments;
-import com.y9vad9.restaurant.data.fsm.DbBotStateStorage;
-import com.y9vad9.restaurant.domain.fsm.BotState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.types.UserId;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
@@ -18,4 +16,5 @@ public record Dependencies(
     UsersLocaleProvider localeProvider,
     UsersLocaleConsumer localeConsumer,
     StateStorage<UserId> stateStorage
-) { }
+) {
+}

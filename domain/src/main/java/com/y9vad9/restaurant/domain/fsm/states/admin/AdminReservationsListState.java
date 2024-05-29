@@ -18,7 +18,6 @@ import com.y9vad9.restaurant.domain.utils.ListUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;

@@ -9,4 +9,5 @@ public record TableOverview(
     int number,
     int availableSeats,
     List<Range<LocalTime>> time
-) {}
+) {
+}

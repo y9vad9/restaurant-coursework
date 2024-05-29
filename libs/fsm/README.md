@@ -40,7 +40,9 @@
 ### FSMContext
 
 Інтерфейс, функціональність якого дозволяє передавати довільну кількість додаткових об'єктів
-та параметрів до методів FSMState, тобто використовується як [DI](https://uk.wikipedia.org/wiki/%D0%92%D0%BF%D1%80%D0%BE%D0%B2%D0%B0%D0%B4%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F_%D0%B7%D0%B0%D0%BB%D0%B5%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9). Приклад:
+та параметрів до методів FSMState, тобто використовується
+як [DI](https://uk.wikipedia.org/wiki/%D0%92%D0%BF%D1%80%D0%BE%D0%B2%D0%B0%D0%B4%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F_%D0%B7%D0%B0%D0%BB%D0%B5%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D0%B5%D0%B9).
+Приклад:
 
 ```java
 import java.util.concurrent.ExecutorService;
@@ -58,4 +60,6 @@ final var context = FSMContext.of(
 
 context.getElement(ExecutorContextElement.KEY);
 ```
-Більше дізнатись можна з вбудованого контекстного елементу – [ExecutorContextElement](src/main/java/com/y9vad9/jfsm/context/ExecutorContextElement.java).
+
+Більше дізнатись можна з вбудованого контекстного
+елементу – [ExecutorContextElement](src/main/java/com/y9vad9/jfsm/context/ExecutorContextElement.java).
