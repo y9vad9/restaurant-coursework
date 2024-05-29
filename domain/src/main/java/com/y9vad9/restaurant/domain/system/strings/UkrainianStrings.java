@@ -203,7 +203,7 @@ public final class UkrainianStrings implements Strings {
 
     @Override
     public String getAdminHelloMessage() {
-        return "Вітаємо в адміністраторскій панелі. Тут ви можете переглядати бронювання" +
+        return "Наразі ви перебуваєте в ролі Адміністратора. Тут ви можете переглядати бронювання" +
             " гостей та саморучно бронювати, якщо бронювання відбувається через телефон.";
     }
 
