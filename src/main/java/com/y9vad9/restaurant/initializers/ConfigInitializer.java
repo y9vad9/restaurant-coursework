@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.y9vad9.restaurant.ApplicationDefaults;
 import com.y9vad9.restaurant.domain.system.types.Contacts;
 import com.y9vad9.restaurant.domain.system.types.Schedule;
@@ -30,6 +32,7 @@ public final class ConfigInitializer {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         if (!contactsFile.exists()) {
@@ -58,10 +61,8 @@ public final class ConfigInitializer {
 
         Contacts contacts = objectMapper.readValue(contactsFile, Contacts.class);
         Schedule schedule = objectMapper.readValue(scheduleFile, Schedule.class);
-        List<TableCapacity> capacities = objectMapper.readValue(tablesCapacitiesFile, new TypeReference<>() {
-        });
-        List<UserId> adminList = objectMapper.readValue(adminListFile, new TypeReference<>() {
-        });
+        List<TableCapacity> capacities = objectMapper.readValue(tablesCapacitiesFile, new TypeReference<>() {});
+        List<UserId> adminList = objectMapper.readValue(adminListFile, new TypeReference<>() {});
 
         return new Config(schedule, contacts, capacities, adminList, objectMapper);
     }

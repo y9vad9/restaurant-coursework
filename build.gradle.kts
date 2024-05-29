@@ -9,6 +9,8 @@ dependencies {
 
     implementation(libs.jackson.core)
     implementation(libs.jackson.jdk8)
+    implementation(libs.jackson.jsr310)
+
 
     implementation(libs.rubenlagus.telegramBotsApi)
 
