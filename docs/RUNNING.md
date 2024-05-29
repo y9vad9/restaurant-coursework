@@ -59,6 +59,14 @@
     java -jar app.jar -databaseUrl jdbc:postgresql://localhost:5432/yourdatabase -databaseUser your_db_user -databasePassword your_db_password -token ваш_токен_бота
     ```
 
+Також можна передавати дані від БД та токен за допомогою змінних середовища:
+- `DATABASE_URL`
+- `DATABASE_USER`
+- `DATABASE_PASSWORD`
+- `BOT_TOKEN`
+
+_____________
+
 Після виконання всіх кроків ваш бот повинен запуститися та бути готовим до роботи.
 
 ### Додаткові ресурси
