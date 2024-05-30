@@ -84,7 +84,7 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
 
         Range<LocalDateTime> scheduleBounds = parsed(schedule.from(reservationTime.first().getDayOfWeek()));
 
-        if (!scheduleBounds.within(reservationTime)) {
+        if (!reservationTime.within(scheduleBounds)) {
             sendAction.execute(new BotAnswer(message.userId(), strings.getUnavailableTimeMessage()));
             onEnter(message, sendAction, context);
             return CompletableFuture.completedFuture(this);
