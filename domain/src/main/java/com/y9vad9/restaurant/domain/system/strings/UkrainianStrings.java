@@ -246,7 +246,7 @@ public final class UkrainianStrings implements Strings {
                         "\n     Дата: " + reservationTime.first().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                 })
                 .collect(Collectors.joining("\n")) +
-            "\n\nВідмінити бронювання можна за допомогою команди /cancel [ідентифікатор] [причина]. " +
+            "\n\nСкасувати бронювання можна за допомогою команди /cancel [ідентифікатор] [причина]. " +
             "Повідомлення про це буде відправлено гостю.";
     }
 
