@@ -47,11 +47,11 @@
 
 ### Крок 4: Запуск бота
 
-Для запуску бота використовуйте JAR-файл та передавайте необхідні параметри як аргументи командного рядка.
+Для запуску бота використовуйте JAR-файл з [останнього релізу](https://github.com/y9vad9/restaurant-coursework/releases/tag/v1.0.0) та передавайте необхідні параметри як аргументи командного рядка.
 
 1. **Запуск для тестування:**
     ```bash
-    java -jar test-app.jar -databaseUrl jdbc:h2:mem:regular;DB_CLOSE_DELAY=-1; -databaseUser user -databasePassword password -token ваш_токен_бота
+    java -jar app.jar -databaseUrl jdbc:h2:mem:regular;DB_CLOSE_DELAY=-1; -databaseUser user -databasePassword password -token ваш_токен_бота
     ```
 
 2. **Запуск для робочого середовища:**
