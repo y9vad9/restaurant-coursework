@@ -1,5 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+    application
+    alias(libs.plugins.shadow.jar)
 }
 
 dependencies {
@@ -18,4 +22,13 @@ dependencies {
     implementation(libs.h2)
 
     implementation(projects.libs.fsm)
+}
+
+application {
+    mainClass.set("com.y9vad9.restaurant.Main")
+}
+
+tasks.withType<ShadowJar> {
+    archiveBaseName.set("app")
+    archiveClassifier.set("")
 }

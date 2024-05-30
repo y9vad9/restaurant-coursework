@@ -29,3 +29,4 @@ h2 = { module = "com.h2database:h2", version.require = "2.2.224" }
 
 [plugins]
 jooq = { id = "org.jooq.jooq-codegen-gradle", version.ref = "jooq" }
+shadow-jar = { id = "com.github.johnrengelman.shadow", version.require = "8.1.1" }
