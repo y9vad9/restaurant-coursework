@@ -36,6 +36,8 @@ public sealed interface Strings extends FSMContextElement permits EnglishStrings
 
     String getChangeLanguageTitle();
 
+    String getUnavailableTimeMessage();
+
     @Override
     default Key<?> key() {
         return KEY;

@@ -51,6 +51,11 @@ public final class UkrainianStrings implements Strings {
     }
 
     @Override
+    public String getUnavailableTimeMessage() {
+        return "Даний час недоступний: ми не працюємо в заданий час.";
+    }
+
+    @Override
     public String getBookTableTitle() {
         return "📝 Забронювати столик";
     }

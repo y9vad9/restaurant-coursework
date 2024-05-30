@@ -10,6 +10,7 @@ import com.y9vad9.restaurant.domain.fsm.states.MainMenuState;
 import com.y9vad9.restaurant.domain.system.repositories.SystemRepository;
 import com.y9vad9.restaurant.domain.system.strings.Strings;
 import com.y9vad9.restaurant.domain.system.types.Range;
+import com.y9vad9.restaurant.domain.system.types.Schedule;
 import com.y9vad9.restaurant.domain.tables.repository.TablesRepository;
 import com.y9vad9.restaurant.domain.tables.types.Table;
 import com.y9vad9.restaurant.domain.utils.ListUtils;
@@ -62,10 +63,10 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
     @Override
     public CompletableFuture<FSMState<?, IncomingMessage, BotAnswer>> onIntent(IncomingMessage message, SendActionFunction<BotAnswer> sendAction, FSMContext context) {
         String input = message.message();
-        System.out.println(input);
 
         Strings strings = context.getElement(Strings.KEY);
         TablesRepository tablesRepository = context.getElement(TablesRepository.KEY);
+        Schedule schedule = context.getElement(SystemRepository.KEY).getSchedule();
 
         if (input.equals(strings.getCancelTitle())) {
             return CompletableFuture.completedFuture(MainMenuState.INSTANCE);
@@ -77,6 +78,14 @@ public record EnterEntryTimeState(Data data) implements BotState<EnterEntryTimeS
             reservationTime = parsed(input);
         } catch (Exception e) {
             sendAction.execute(new BotAnswer(message.userId(), strings.getInvalidInputMessage()));
+            onEnter(message, sendAction, context);
+            return CompletableFuture.completedFuture(this);
+        }
+
+        Range<LocalDateTime> scheduleBounds = parsed(schedule.from(reservationTime.first().getDayOfWeek()));
+
+        if (!scheduleBounds.within(reservationTime)) {
+            sendAction.execute(new BotAnswer(message.userId(), strings.getUnavailableTimeMessage()));
             onEnter(message, sendAction, context);
             return CompletableFuture.completedFuture(this);
         }

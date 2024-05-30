@@ -51,6 +51,11 @@ public final class EnglishStrings implements Strings {
     }
 
     @Override
+    public String getUnavailableTimeMessage() {
+        return "This time is unavailable: chosen time is out of our schedule.";
+    }
+
+    @Override
     public String getBookTableTitle() {
         return "📝 Book a Table";
     }
